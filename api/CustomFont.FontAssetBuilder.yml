@@ -23,8 +23,12 @@ items:
   fullName: CustomFont.FontAssetBuilder
   type: Class
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: FontAssetBuilder
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
+    path: CustomFont/CustomFontPlugin.cs
     startLine: 242
   assemblies:
   - CustomFont
@@ -56,8 +60,12 @@ items:
   fullName: CustomFont.FontAssetBuilder.FontAssetBuilder(UnityEngine.Font)
   type: Constructor
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: .ctor
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
+    path: CustomFont/CustomFontPlugin.cs
     startLine: 242
   assemblies:
   - CustomFont
@@ -69,7 +77,7 @@ items:
     parameters:
     - id: font
       type: UnityEngine.Font
-      description: The Font
+      description: The source font to create font asset from.
     content.vb: Public Sub New(font As Font)
   overload: CustomFont.FontAssetBuilder.#ctor*
   nameWithType.vb: FontAssetBuilder.New(Font)
@@ -87,8 +95,12 @@ items:
   fullName: CustomFont.FontAssetBuilder.Font
   type: Property
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: Font
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
+    path: CustomFont/CustomFontPlugin.cs
     startLine: 247
   assemblies:
   - CustomFont
@@ -114,8 +126,12 @@ items:
   fullName: CustomFont.FontAssetBuilder.CharList
   type: Property
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: CharList
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
+    path: CustomFont/CustomFontPlugin.cs
     startLine: 253
   assemblies:
   - CustomFont
@@ -144,13 +160,20 @@ items:
   fullName: CustomFont.FontAssetBuilder.FaceIndex
   type: Property
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: FaceIndex
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
-    startLine: 258
+    path: CustomFont/CustomFontPlugin.cs
+    startLine: 259
   assemblies:
   - CustomFont
   namespace: CustomFont
-  summary: A parameter directly passed to `FontAsset.CreateFontAsset()`.
+  summary: >-
+    A parameter directly passed to `FontAsset.CreateFontAsset()`.
+
+    Default: `0`
   example: []
   syntax:
     content: public int FaceIndex { get; set; }
@@ -171,13 +194,20 @@ items:
   fullName: CustomFont.FontAssetBuilder.SamplingPointSize
   type: Property
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: SamplingPointSize
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
-    startLine: 263
+    path: CustomFont/CustomFontPlugin.cs
+    startLine: 265
   assemblies:
   - CustomFont
   namespace: CustomFont
-  summary: A parameter directly passed to `FontAsset.CreateFontAsset()`.
+  summary: >-
+    A parameter directly passed to `FontAsset.CreateFontAsset()`.
+
+    Default: `90`
   example: []
   syntax:
     content: public int SamplingPointSize { get; set; }
@@ -198,13 +228,20 @@ items:
   fullName: CustomFont.FontAssetBuilder.AtlasPadding
   type: Property
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: AtlasPadding
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
-    startLine: 268
+    path: CustomFont/CustomFontPlugin.cs
+    startLine: 271
   assemblies:
   - CustomFont
   namespace: CustomFont
-  summary: A parameter directly passed to `FontAsset.CreateFontAsset()`.
+  summary: >-
+    A parameter directly passed to `FontAsset.CreateFontAsset()`.
+
+    Default: `9`
   example: []
   syntax:
     content: public int AtlasPadding { get; set; }
@@ -225,13 +262,20 @@ items:
   fullName: CustomFont.FontAssetBuilder.RenderMode
   type: Property
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: RenderMode
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
-    startLine: 273
+    path: CustomFont/CustomFontPlugin.cs
+    startLine: 277
   assemblies:
   - CustomFont
   namespace: CustomFont
-  summary: A parameter directly passed to `FontAsset.CreateFontAsset()`.
+  summary: >-
+    A parameter directly passed to `FontAsset.CreateFontAsset()`.
+
+    Default: `GlyphRenderMode.SDFAA`
   example: []
   syntax:
     content: public GlyphRenderMode RenderMode { get; set; }
@@ -252,13 +296,20 @@ items:
   fullName: CustomFont.FontAssetBuilder.AtlasWidth
   type: Property
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: AtlasWidth
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
-    startLine: 278
+    path: CustomFont/CustomFontPlugin.cs
+    startLine: 283
   assemblies:
   - CustomFont
   namespace: CustomFont
-  summary: A parameter directly passed to `FontAsset.CreateFontAsset()`.
+  summary: >-
+    A parameter directly passed to `FontAsset.CreateFontAsset()`.
+
+    Default: `1024`
   example: []
   syntax:
     content: public int AtlasWidth { get; set; }
@@ -279,13 +330,20 @@ items:
   fullName: CustomFont.FontAssetBuilder.AtlasHeight
   type: Property
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: AtlasHeight
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
-    startLine: 283
+    path: CustomFont/CustomFontPlugin.cs
+    startLine: 289
   assemblies:
   - CustomFont
   namespace: CustomFont
-  summary: A parameter directly passed to `FontAsset.CreateFontAsset()`.
+  summary: >-
+    A parameter directly passed to `FontAsset.CreateFontAsset()`.
+
+    Default: `1024`
   example: []
   syntax:
     content: public int AtlasHeight { get; set; }
@@ -306,13 +364,17 @@ items:
   fullName: CustomFont.FontAssetBuilder.Create()
   type: Method
   source:
+    remote:
+      path: CustomFont/CustomFontPlugin.cs
+      branch: main
+      repo: https://CarrieForle@github.com/CarrieForle/CustomFontSilksong.git
     id: Create
-    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
-    startLine: 290
+    path: CustomFont/CustomFontPlugin.cs
+    startLine: 296
   assemblies:
   - CustomFont
   namespace: CustomFont
-  summary: Create font asset.
+  summary: Create font asset with the properties.
   example: []
   syntax:
     content: public TMP_FontAsset Create()

@@ -255,19 +255,19 @@ public class FontAssetBuilder(Font font)
 
     /// <summary>
     /// A parameter directly passed to `FontAsset.CreateFontAsset()`.
-    /// Default: 0
+    /// Default: `0`
     /// </summary>
     public int FaceIndex { get; set; } = 0;
 
     /// <summary>
     /// A parameter directly passed to `FontAsset.CreateFontAsset()`.
-    /// Default: 90
+    /// Default: `90`
     /// </summary>
     public int SamplingPointSize { get; set; } = 90;
 
     /// <summary>
     /// A parameter directly passed to `FontAsset.CreateFontAsset()`.
-    /// Default: 9
+    /// Default: `9`
     /// </summary>
     public int AtlasPadding { get; set; } = 9;
 
