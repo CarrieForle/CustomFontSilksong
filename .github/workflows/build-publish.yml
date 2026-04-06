@@ -30,7 +30,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
       attestation-url: ${{ steps.attest.outputs.attestation-url }}
       # when you are ready to publish your first release, change this to 'true'
-      allow-release: 'false'
+      allow-release: true
       is-new-version: ${{ !fromJSON(steps.needs-release.outputs.exists || 'true') }}
       thunderstore-artifact-id: ${{ steps.thunderstore-artifact.outputs.artifact-id }}
       nuget-artifact-id: ${{ steps.nuget-artifact.outputs.artifact-id }}
@@ -44,25 +44,27 @@ jobs:
     - name: Build
       run: dotnet build -c Release --verbosity normal
     - name: Pack
-      run: dotnet pack -o nuget/
+      run: dotnet pack
     - name: Get Version
       id: version
       run: |-
-        VERSION=$(dotnet build CustomFont.csproj -getProperty:Version)
+        VERSION=$(dotnet build CustomFont -getProperty:Version)
         echo Version is $VERSION
         echo "version=$VERSION" >> $GITHUB_OUTPUT
     - name: Upload thunderstore artifact
       id: thunderstore-artifact
       uses: actions/upload-artifact@v7
       with:
-        path: thunderstore/dist/*.zip
+        path: CustomFont/thunderstore/dist/*.zip
         archive: false
+        if-no-files-found: error
     - name: Upload nuget artifact
       id: nuget-artifact
       uses: actions/upload-artifact@v7
       with:
-        path: nuget/*.nupkg
+        path: CustomFont/bin/**/*.nupkg
         archive: false
+        if-no-files-found: error
     - name: Check if release needed
       id: needs-release
       uses: mukunku/tag-exists-action@v1.7.0
@@ -75,8 +77,8 @@ jobs:
       if: github.event_name == 'push' && steps.needs-release.outputs.exists == 'false'
       with:
         subject-path: |
-          thunderstore/dist/*.zip
-          nuget/*.nupkg
+          CustomFont/thunderstore/dist/*.zip
+          CustomFont/bin/**/*.nupkg
 
   # Publish to Thunderstore to that users can install it
   release-thunderstore:
@@ -129,12 +131,12 @@ jobs:
   release-nuget:
     needs:
       - build
-      - secret-check 
+      - secret-check
+    permissions:
+      id-token: write  # enable GitHub OIDC token issuance for this job
     runs-on: ubuntu-latest
     if: |
-      needs.secret-check.outputs.has-nuget-secret == 'true' && 
-      (
-        (
+        needs.secret-check.outputs.has-nuget-account == 'true' && (
           github.event_name == 'push' && 
           needs.build.outputs.allow-release == 'true' && 
           needs.build.outputs.is-new-version == 'true'
@@ -143,12 +145,6 @@ jobs:
           github.event_name == 'workflow_dispatch' &&
           github.event.inputs.force_nuget == 'true'
         )
-      )
-    # Do not substitute your NuGet API key in this workflow! Instead, add a secret to your repository
-    # https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets
-    env:
-      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-
     steps:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
@@ -158,12 +154,13 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         artifact-ids: ${{ needs.build.outputs.nuget-artifact-id }}
-        path: nuget/
-    - name: Publish to NuGet
-      run: |-
-        dotnet nuget push nuget/*.nupkg \
-          --api-key $NUGET_API_KEY \
-          --source https://api.nuget.org/v3/index.json
+    - name: NuGet login (OIDC → temp API key)
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: ${{ secrets.NUGET_USER }}
+    - name: NuGet push
+      run: dotnet nuget push *.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
 
   # Publish to GitHub releases to keep release history on the repository (needed for this workflow to work properly
   # but is also nice for multiple other reasons such as auto-tagging *after* a build success)
@@ -195,7 +192,7 @@ jobs:
   secret-check:
     runs-on: ubuntu-latest
     outputs:
-      has-nuget-secret: ${{ secrets.NUGET_API_KEY != '' }}
-      has-thunderstore-secret: ${{ secrets.THUNDERSTORE_API_KEY != '' }}
+      has-nuget-account: ${{ secrets.NUGET_USER != '' }}
+      has-thunderstore-secret: ${{ secrets.THUNDERSTORE_API_KEY != '' }} && false
     steps:
       - run: echo no-op

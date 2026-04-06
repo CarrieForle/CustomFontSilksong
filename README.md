@@ -8,12 +8,12 @@ Place `font.ttf` or `font.otf` in the folder.
 
 ## Developer Usage
 
-See [here](http://localhost).
+See [documentation](https://carrieforle.github.io/CustomFontSilksong/).
 
 ## Build
 
 ### Doc
 
 ```sh
-dotnet docfx docfx.json --server
+dotnet docfx docfx.json --serve
 ```

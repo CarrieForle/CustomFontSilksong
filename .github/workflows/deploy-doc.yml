@@ -1,0 +1,34 @@
+name: Deploy documentation
+on:
+  push:
+    branches:
+      - main
+permissions:
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+jobs:
+  publish-docs:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+    - name: Dotnet Setup
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 10.x
+    - run: dotnet tool restore
+    - run: dotnet docfx docfx.json
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v4
+      with:
+        path: '_site'
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v5
