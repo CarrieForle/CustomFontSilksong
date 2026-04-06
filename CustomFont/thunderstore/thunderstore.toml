@@ -21,7 +21,7 @@ BepInEx-BepInExPack_Silksong = "5.4.2304"
 # by other build scripts
 [build]
 icon = "./icon.png"
-readme = "../README.md"
+readme = "../../README.md"
 outdir = "./dist"
 
 [[build.copy]]

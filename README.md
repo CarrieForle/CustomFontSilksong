@@ -8,3 +8,12 @@ Place `font.ttf` or `font.otf` in the folder.
 
 ## Developer Usage
 
+See [here](http://localhost).
+
+## Build
+
+### Doc
+
+```sh
+dotnet docfx docfx.json --server
+```

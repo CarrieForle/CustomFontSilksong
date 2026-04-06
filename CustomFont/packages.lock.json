@@ -18,17 +18,23 @@
           "HarmonyX": "2.7.0"
         }
       },
+      "Docfx.App": {
+        "type": "Direct",
+        "requested": "[2.78.5, )",
+        "resolved": "2.78.5",
+        "contentHash": "TSLqzrzENzUm7p8SUH+lqsyXKkTDtwnAjyMEpvDyb6CYhrbVYxulN0zwPU1758lG2Rrg9iMaDDkNIo1ZfKMCTQ=="
+      },
       "Hamunii.BepInEx.AutoPlugin": {
         "type": "Direct",
-        "requested": "[2.0.1, )",
-        "resolved": "2.0.1",
-        "contentHash": "UDVQtYOGU1v+xkYIRubm4zSIRtCW42kWgJ3sXIbqYSD1qSseH9gU44+zQMNRCy3BYXITtwWE3RqoyJdWUjDASA=="
+        "requested": "[2.1.0, )",
+        "resolved": "2.1.0",
+        "contentHash": "EuH0DoeBkpEiLYwCVZrlrQiNoqYi7U42+MCGpVim22erghvYYjPosEQTCHMsmyyBjLO/0NuLCu4I9aO/EkjVRQ=="
       },
       "Harmonize": {
         "type": "Direct",
-        "requested": "[1.0.3, )",
-        "resolved": "1.0.3",
-        "contentHash": "jkcOJdYmQrFAwIanmaRiRhYdJnsjtczrzOdwcUU67mbx23e/cHZRErryfdWvASGjXQtDYfjEWNfxHml4DtkDVA=="
+        "requested": "[1.0.6, )",
+        "resolved": "1.0.6",
+        "contentHash": "V5Y8evixyTU1MO0klQfV64vEwbMuitlNUEi3o/tvN/9PUS5Iitcn6RZxz3vW1MKfrywHayLR1jLxiL8TlaH5pQ=="
       },
       "HarmonyX": {
         "type": "Direct",
@@ -42,9 +48,9 @@
       },
       "Microsoft.Unity.Analyzers": {
         "type": "Direct",
-        "requested": "[1.25.0, )",
-        "resolved": "1.25.0",
-        "contentHash": "jOclVb2PVoOdKafuzt3bJ3BHkbjsfuAx+60yqP4zCAhlNa1rwn1Jt05qrmqJgmBY42S08hXbps9KA6QR2Z7aOA=="
+        "requested": "[1.26.0, )",
+        "resolved": "1.26.0",
+        "contentHash": "lU4QRpGxzwBGkDJs86Q18CwhiqigssQrItJFr+c1Ijra35Y/uTwV/bRiSIYcXSaWl9RsXCi6dqG4xVAXb9sCtQ=="
       },
       "Silksong.GameLibs": {
         "type": "Direct",

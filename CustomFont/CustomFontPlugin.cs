@@ -204,7 +204,7 @@ static class LanguagePatch
 #pragma warning restore HARMONIZE002
 #pragma warning restore HARMONIZE003
 
-public static class Helper
+static class Helper
 {
     public static string path(GameObject go)
     {
@@ -221,7 +221,7 @@ public static class Helper
     }
 }
 
-public class CustomFontException : Exception
+class CustomFontException : Exception
 {
     public CustomFontException(string message) : base(message)
     {
@@ -229,24 +229,71 @@ public class CustomFontException : Exception
     }
 }
 
-public enum ReplaceFontMode
+enum ReplaceFontMode
 {
     Disabled,
     EffectedByLanguage,
     All,
 }
 
+/// <summary>
+/// A builder class to create font asset.
+/// </summary>
+/// <param name="font">The source font to create font asset from.</param>
 public class FontAssetBuilder(Font font)
 {
+    /// <summary>
+    /// The source font to create font asset from.
+    /// </summary>
     public Font Font { get; set; } = font;
+
+    /// <summary>
+    /// The characters to be included in the font asset.
+    /// If this is null, all characters are included.
+    /// </summary>
     public ICollection<char>? CharList { get; set; }
+
+    /// <summary>
+    /// A parameter directly passed to `FontAsset.CreateFontAsset()`.
+    /// Default: 0
+    /// </summary>
     public int FaceIndex { get; set; } = 0;
+
+    /// <summary>
+    /// A parameter directly passed to `FontAsset.CreateFontAsset()`.
+    /// Default: 90
+    /// </summary>
     public int SamplingPointSize { get; set; } = 90;
+
+    /// <summary>
+    /// A parameter directly passed to `FontAsset.CreateFontAsset()`.
+    /// Default: 9
+    /// </summary>
     public int AtlasPadding { get; set; } = 9;
+
+    /// <summary>
+    /// A parameter directly passed to `FontAsset.CreateFontAsset()`.
+    /// Default: `GlyphRenderMode.SDFAA`
+    /// </summary>
     public GlyphRenderMode RenderMode { get; set; } = GlyphRenderMode.SDFAA;
+
+    /// <summary>
+    /// A parameter directly passed to `FontAsset.CreateFontAsset()`.
+    /// Default: `1024`
+    /// </summary>
     public int AtlasWidth { get; set; } = 1024;
+
+    /// <summary>
+    /// A parameter directly passed to `FontAsset.CreateFontAsset()`.
+    /// Default: `1024`
+    /// </summary>
     public int AtlasHeight { get; set; } = 1024;
 
+    /// <summary>
+    /// Create font asset with the properties.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="CustomFontException">Failed to create font asset</exception>
     public TMProOld.TMP_FontAsset Create()
     {
         TMProOld.TMP_FontAsset.FontAssetTypes fontAssetType;

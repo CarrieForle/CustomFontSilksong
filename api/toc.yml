@@ -1,0 +1,13 @@
+### YamlMime:TableOfContent
+items:
+- uid: CustomFont
+  name: CustomFont
+  type: Namespace
+  items:
+  - uid: CustomFont.CustomFontPlugin
+    name: CustomFontPlugin
+    type: Class
+  - uid: CustomFont.FontAssetBuilder
+    name: FontAssetBuilder
+    type: Class
+memberLayout: SamePage

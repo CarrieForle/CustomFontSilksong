@@ -1,0 +1,107 @@
+### YamlMime:ManagedReference
+items:
+- uid: CustomFont.ReplaceFontMode
+  commentId: T:CustomFont.ReplaceFontMode
+  id: ReplaceFontMode
+  parent: CustomFont
+  children:
+  - CustomFont.ReplaceFontMode.All
+  - CustomFont.ReplaceFontMode.Disabled
+  - CustomFont.ReplaceFontMode.EffectedByLanguage
+  langs:
+  - csharp
+  - vb
+  name: ReplaceFontMode
+  nameWithType: ReplaceFontMode
+  fullName: CustomFont.ReplaceFontMode
+  type: Enum
+  source:
+    id: ReplaceFontMode
+    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
+    startLine: 231
+  assemblies:
+  - CustomFont
+  namespace: CustomFont
+  syntax:
+    content: public enum ReplaceFontMode
+    content.vb: Public Enum ReplaceFontMode
+- uid: CustomFont.ReplaceFontMode.Disabled
+  commentId: F:CustomFont.ReplaceFontMode.Disabled
+  id: Disabled
+  parent: CustomFont.ReplaceFontMode
+  langs:
+  - csharp
+  - vb
+  name: Disabled
+  nameWithType: ReplaceFontMode.Disabled
+  fullName: CustomFont.ReplaceFontMode.Disabled
+  type: Field
+  source:
+    id: Disabled
+    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
+    startLine: 233
+  assemblies:
+  - CustomFont
+  namespace: CustomFont
+  syntax:
+    content: Disabled = 0
+    return:
+      type: CustomFont.ReplaceFontMode
+- uid: CustomFont.ReplaceFontMode.EffectedByLanguage
+  commentId: F:CustomFont.ReplaceFontMode.EffectedByLanguage
+  id: EffectedByLanguage
+  parent: CustomFont.ReplaceFontMode
+  langs:
+  - csharp
+  - vb
+  name: EffectedByLanguage
+  nameWithType: ReplaceFontMode.EffectedByLanguage
+  fullName: CustomFont.ReplaceFontMode.EffectedByLanguage
+  type: Field
+  source:
+    id: EffectedByLanguage
+    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
+    startLine: 234
+  assemblies:
+  - CustomFont
+  namespace: CustomFont
+  syntax:
+    content: EffectedByLanguage = 1
+    return:
+      type: CustomFont.ReplaceFontMode
+- uid: CustomFont.ReplaceFontMode.All
+  commentId: F:CustomFont.ReplaceFontMode.All
+  id: All
+  parent: CustomFont.ReplaceFontMode
+  langs:
+  - csharp
+  - vb
+  name: All
+  nameWithType: ReplaceFontMode.All
+  fullName: CustomFont.ReplaceFontMode.All
+  type: Field
+  source:
+    id: All
+    path: C:\Users\carri\Desktop\CustomFont\CustomFont\CustomFontPlugin.cs
+    startLine: 235
+  assemblies:
+  - CustomFont
+  namespace: CustomFont
+  syntax:
+    content: All = 2
+    return:
+      type: CustomFont.ReplaceFontMode
+references:
+- uid: CustomFont
+  commentId: N:CustomFont
+  href: CustomFont.html
+  name: CustomFont
+  nameWithType: CustomFont
+  fullName: CustomFont
+- uid: CustomFont.ReplaceFontMode
+  commentId: T:CustomFont.ReplaceFontMode
+  parent: CustomFont
+  href: CustomFont.ReplaceFontMode.html
+  name: ReplaceFontMode
+  nameWithType: ReplaceFontMode
+  fullName: CustomFont.ReplaceFontMode
