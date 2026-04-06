@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using TeamCherry.Localization;
 using UnityEngine;
+using UnityEngine.TextCore;
 using UnityEngine.TextCore.LowLevel;
 using UnityEngine.TextCore.Text;
 using static CustomFont.CustomFontPlugin;
@@ -16,87 +20,204 @@ namespace CustomFont;
 [BepInAutoPlugin(id: "io.github.carrieforle.customfont")]
 public partial class CustomFontPlugin : BaseUnityPlugin
 {
-    private static ConfigEntry<bool> configOverrideMenu;
-    private static ConfigEntry<bool> configOverrideGameplay;
-    private static ConfigEntry<bool> configOverrideHud;
-    private static string[] fontPaths;
+    internal static ConfigEntry<ReplaceFontMode> configReplaceFontMode;
+    internal static ConfigEntry<float> configFontScale;
+    internal static string fontPath;
     public static ManualLogSource logger;
-    private static Font? font;
-    private static TMProOld.TMP_FontAsset? fontAsset;
-    private static bool tryLoadedFont = false;
+    internal static Font? font;
+    internal static TMProOld.TMP_FontAsset? fontAsset;
+    internal static Dictionary<TMProOld.TextMeshPro, (float FontScale, TMProOld.TMP_FontAsset Font)> oldFonts = [];
+    private Harmony harmony;
 
     private void Awake()
     {
-        Harmony.CreateAndPatchAll(typeof(CustomFontPlugin), Id);
+        harmony = Harmony.CreateAndPatchAll(typeof(Patch), Id);
         logger = Logger;
-        configOverrideMenu = Config.Bind(
-            "Override",
-            "Menu",
-            false,
-            "Apply font to start and pause menu."
+
+        configReplaceFontMode = Config.Bind(
+            "General",
+            "ReplaceFontMode",
+            ReplaceFontMode.EffectedByLanguage,
+            "What kind of text to use custom font."
         );
 
-        configOverrideGameplay = Config.Bind(
-            "Override",
-            "Gameplay",
-            true,
-            "Apply font to dialogues, popups, etc."
+        configFontScale = Config.Bind(
+            "General",
+            "FontScale",
+            1f,
+            "The scale of font size. Default: 1"
         );
 
-        configOverrideHud = Config.Bind(
-            "Override",
-            "Hud",
-            false,
-            "Apply font to HUD and inventory."
-        );
-
-        fontPaths = [
+        TryLoadFont([
             Path.Combine(Path.GetDirectoryName(Info.Location), "font.otf"),
             Path.Combine(Path.GetDirectoryName(Info.Location), "font.ttf"),
-        ];
+        ]);
 
-        TryLoadFont();
-    }
-
-#pragma warning disable HARMONIZE003
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(ChangeFontByLanguage), nameof(ChangeFontByLanguage.SetFont), [])]
-    static void PatchFont(ChangeFontByLanguage __instance)
-    {
-        if (fontAsset != null)
+        configReplaceFontMode.SettingChanged += (s, e) =>
         {
-            __instance.tmpro.font = fontAsset;
-        }
-    }
-#pragma warning restore HARMONIZE003
+            PatchFontInGameCameras();
+            var cfbls = FindObjectsByType<ChangeFontByLanguage>(FindObjectsSortMode.None);
+            foreach (var cfbl in cfbls)
+            {
+                cfbl.SetFont();
+            }
+        };
 
-    private static void TryLoadFont()
+        configFontScale.SettingChanged += (s, e) =>
+        {
+            if (configFontScale.Value <= 0)
+            {
+                logger.LogError("Invalid font scale. Resetted to 1.");
+                configFontScale.Value = 1f;
+            }
+        };
+    }
+
+    private void Start()
+    {
+        harmony.PatchAll(typeof(LanguagePatch));
+    }
+
+    private static void TryLoadFont(IEnumerable<string> fontPaths)
     {
         try
         {
-            if (!tryLoadedFont)
+            fontPath = fontPaths
+                .FirstOrDefault(fontPath => File.Exists(fontPath));
+
+            if (fontPath is null)
             {
-                string? fontPath = fontPaths
-                    .FirstOrDefault(fontPath => File.Exists(fontPath));
-
-                if (fontPath is null)
-                {
-                    logger.LogInfo("No font found.");
-                    tryLoadedFont = true;
-                    return;
-                }
-
-                fontAsset = new FontAssetBuilder(fontPath).Build();
+                logger.LogInfo("No font found.");
+                return;
             }
+
+            fontAsset = new FontAssetBuilder(new Font(fontPath)).Create();
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error while loading font.\n{ex.StackTrace}");
+            logger.LogError($"Error while loading font: {ex.Message}\n{ex.StackTrace}");
         }
-        finally
+    }
+
+    internal static void PatchFontInGameCameras()
+    {
+        if (fontAsset == null)
         {
-            tryLoadedFont = true;
+            return;
         }
+
+        var tmpros = GameCameras.SilentInstance.hudCamera.gameObject.GetComponentsInChildren<TMProOld.TextMeshPro>(true);
+        foreach (var tmpro in tmpros)
+        {
+            oldFonts.TryAdd(tmpro, (tmpro.fontSize, tmpro.font));
+
+            if (tmpro.font.fallbackFontAssets is null)
+            {
+                tmpro.font.fallbackFontAssets = [tmpro.font];
+            }
+            else
+            {
+                tmpro.font.fallbackFontAssets.Insert(0, tmpro.font);
+            }
+        }
+
+        foreach (var tmpro in tmpros)
+        {
+            var fontAttr = oldFonts[tmpro];
+            if (configReplaceFontMode.Value == ReplaceFontMode.All)
+            {
+                tmpro.font = fontAsset;
+                tmpro.fontSize = fontAttr.FontScale * configFontScale.Value;
+            }
+            else
+            {
+                tmpro.font = fontAttr.Font;
+                tmpro.fontSize = fontAttr.FontScale;
+            }
+        }
+
+        logger.LogDebug($"Patched {tmpros.Length} TMPros in GameCameras");
+    }
+}
+
+#pragma warning disable HARMONIZE002
+#pragma warning disable HARMONIZE003
+static class Patch
+{
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.HigherThanNormal)]
+    [HarmonyPatch(typeof(ChangeFontByLanguage), nameof(ChangeFontByLanguage.SetFont), [])]
+    private static void SetFont(ChangeFontByLanguage __instance)
+    {
+        if (fontAsset == null || configReplaceFontMode.Value == ReplaceFontMode.Disabled)
+        {
+            return;
+        }
+
+        __instance.tmpro.font = fontAsset;
+        Material fallbackMaterial = TMProOld.TMP_MaterialManager.GetFallbackMaterial(__instance.defaultMaterial, __instance.tmpro.fontSharedMaterial);
+        __instance.FallbackMaterialReference = fallbackMaterial;
+        __instance.tmpro.fontSharedMaterial = fallbackMaterial;
+
+        var fallbackFont = Language._currentLanguage switch
+        {
+            LanguageCode.JA => __instance.fontJA,
+            LanguageCode.KO => __instance.fontKO,
+            LanguageCode.RU => __instance.fontRU,
+            LanguageCode.ZH => __instance.fontZH,
+            LanguageCode.ZH_TW => __instance.fontZH_TW,
+            _ => __instance.defaultFont
+        };
+
+        if (__instance.tmpro.font.fallbackFontAssets is null)
+        {
+            __instance.tmpro.font.fallbackFontAssets = [fallbackFont];
+        }
+        else
+        {
+            __instance.tmpro.font.fallbackFontAssets.Insert(0, fallbackFont);
+        }
+
+        __instance.tmpro.fontSize *= configFontScale.Value;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.HigherThanNormal)]
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.ContinueGame))]
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartNewGame))]
+    private static void PatchFont()
+    {
+        PatchFontInGameCameras();
+    }
+}
+
+static class LanguagePatch
+{
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Language), nameof(Language.DoSwitch))]
+    private static void ClearOldFonts()
+    {
+        oldFonts.Clear();
+    }
+}
+
+#pragma warning restore HARMONIZE002
+#pragma warning restore HARMONIZE003
+
+public static class Helper
+{
+    public static string path(GameObject go)
+    {
+        var t = go.transform;
+        var sb = new StringBuilder(t.name);
+
+        while (t.parent != null)
+        {
+            t = t.parent;
+            sb.Insert(0, $"{t.name}/");
+        }
+
+        return sb.ToString();
     }
 }
 
@@ -108,37 +229,16 @@ public class CustomFontException : Exception
     }
 }
 
-//
-public class FontAssetBuilder
+public enum ReplaceFontMode
 {
-    private Font? font;
-    public Font? Font
-    {
-        get => font;
-        set
-        {
-            if (value != null)
-            {
-                font = value;
-                fontPath = null;
-            }
-        }
-    }
+    Disabled,
+    EffectedByLanguage,
+    All,
+}
 
-    private string? fontPath;
-    public string? FontPath
-    {
-        get => fontPath;
-        set
-        {
-            if (value != null)
-            {
-                fontPath = value;
-                font = null;
-            }
-        }
-    }
-
+public class FontAssetBuilder(Font font)
+{
+    public Font Font { get; set; } = font;
     public ICollection<char>? CharList { get; set; }
     public int FaceIndex { get; set; } = 0;
     public int SamplingPointSize { get; set; } = 90;
@@ -147,19 +247,8 @@ public class FontAssetBuilder
     public int AtlasWidth { get; set; } = 1024;
     public int AtlasHeight { get; set; } = 1024;
 
-    public FontAssetBuilder(Font font)
+    public TMProOld.TMP_FontAsset Create()
     {
-        this.font = font;
-    }
-
-    public FontAssetBuilder(string fontPath)
-    {
-        this.fontPath = fontPath;
-    }
-
-    public TMProOld.TMP_FontAsset Build()
-    {
-        logger.LogInfo($"Loaded font: \"{fontPath}\"");
         TMProOld.TMP_FontAsset.FontAssetTypes fontAssetType;
         switch (RenderMode)
         {
@@ -183,20 +272,7 @@ public class FontAssetBuilder
                 throw new CustomFontException("GlyphRenderMode.DEFAULT is not allowed.");
         }
 
-        FontAsset? newFontAsset;
-
-        if (FontPath is not null)
-        {
-            logger.LogInfo("Using font path");
-            newFontAsset = FontAsset.CreateFontAsset(FontPath, FaceIndex, SamplingPointSize, AtlasPadding, RenderMode, AtlasWidth, AtlasHeight, AtlasPopulationMode.Dynamic, false);
-        }
-        else
-        {
-            logger.LogInfo("Using font class");
-            newFontAsset = FontAsset.CreateFontAsset(Font, FaceIndex, SamplingPointSize, AtlasPadding, RenderMode, AtlasWidth, AtlasHeight, AtlasPopulationMode.Dynamic, false);
-        }
-
-        logger.LogInfo("Created new font asset");
+        FontAsset? newFontAsset = FontAsset.CreateFontAsset(Font, FaceIndex, SamplingPointSize, AtlasPadding, RenderMode, AtlasWidth, AtlasHeight, AtlasPopulationMode.Dynamic, false);
 
         if (newFontAsset == null)
         {
@@ -204,14 +280,12 @@ public class FontAssetBuilder
         }
 
         TMProOld.TMP_FontAsset tmp_FontAsset = ScriptableObject.CreateInstance<TMProOld.TMP_FontAsset>();
+        tmp_FontAsset.name = font.name;
 
-        IEnumerable<uint>? charList = CharList?.Select(ch => (uint)ch);
-        if (charList is null)
-        {
-            charList = Enumerable
+        IEnumerable<uint>? charList = CharList
+            ?.Select(ch => (uint)ch) ?? Enumerable
                 .Range(0, 0x00ffff)
                 .Select(c => (uint)c);
-        }
 
         if (!newFontAsset.TryAddCharacters(charList.ToArray(), out var missingChars, false))
         {
@@ -223,7 +297,6 @@ public class FontAssetBuilder
             }
         }
 
-        tmp_FontAsset.name = newFontAsset.name;
         TMProOld.TMP_Glyph[] glyphs = newFontAsset.characterTable
             .Select(character => NewToOld(character, AtlasHeight))
             .ToArray();
@@ -231,7 +304,7 @@ public class FontAssetBuilder
         logger.LogDebug($"Loaded {glyphs.Length} glyphs.");
         tmp_FontAsset.m_fontInfo = NewToOld(newFontAsset.faceInfo, AtlasWidth, AtlasHeight, AtlasPadding, glyphs.Length);
         tmp_FontAsset.AddGlyphInfo(glyphs);
-        tmp_FontAsset.AddKerningInfo(new TMProOld.KerningTable());
+        tmp_FontAsset.AddKerningInfo(NewToOld(newFontAsset));
         tmp_FontAsset.fontAssetType = fontAssetType;
 
         var texture2D = newFontAsset.atlasTexture;
@@ -279,7 +352,42 @@ public class FontAssetBuilder
         /////
 
         tmp_FontAsset.ReadFontDefinition();
+        FontEngine.UnloadFontFace();
         return tmp_FontAsset;
+    }
+
+    // https://docs.unity3d.com/Manual/UIE-font-asset-properties.html
+    private static TMProOld.KerningTable NewToOld(FontAsset fontAsset)
+    {
+        Dictionary<uint, uint> glyphToUnicode = [];
+        HashSet<uint> excludeGlyphs = [];
+
+        // There might be multiple unicode code point for a glyph
+        foreach (var ch in fontAsset.characterTable)
+        {
+            if (!glyphToUnicode.TryAdd(ch.glyphIndex, ch.unicode))
+            {
+                excludeGlyphs.Add(ch.glyphIndex);
+            }
+        }
+
+        excludeGlyphs.Do(glyph => glyphToUnicode.Remove(glyph));
+        var kernings = new TMProOld.KerningTable();
+
+        foreach (var record in fontAsset.fontFeatureTable.glyphPairAdjustmentRecords)
+        {
+            if (glyphToUnicode.TryGetValue(record.firstAdjustmentRecord.glyphIndex, out var leftUnicode) &&
+                glyphToUnicode.TryGetValue(record.secondAdjustmentRecord.glyphIndex, out var rightUnicode))
+            {
+                kernings.AddKerningPair(
+                    (int)leftUnicode,
+                    (int)rightUnicode,
+                    record.firstAdjustmentRecord.glyphValueRecord.xAdvance
+                );
+            }
+        }
+
+        return kernings;
     }
 
     private static TMProOld.TMP_Glyph NewToOld(Character character, int atlasHeight)
@@ -294,11 +402,11 @@ public class FontAssetBuilder
             xOffset = character.glyph.metrics.horizontalBearingX,
             yOffset = character.glyph.metrics.horizontalBearingY,
             xAdvance = character.glyph.metrics.horizontalAdvance,
-            scale = 1f,
+            scale = .5f,
         };
     }
 
-    private static TMProOld.FaceInfo NewToOld(UnityEngine.TextCore.FaceInfo newFaceInfo, float atlasWidth, float atlasHeight, float atlasPadding, int charCount)
+    private static TMProOld.FaceInfo NewToOld(FaceInfo newFaceInfo, float atlasWidth, float atlasHeight, float atlasPadding, int charCount)
     {
         return new TMProOld.FaceInfo
         {
