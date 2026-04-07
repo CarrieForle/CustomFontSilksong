@@ -1,3 +1,11 @@
+# Include package
+
+Include the package from [Nuget](https://www.nuget.org/packages/CustomFontSilksong) as follow:
+
+```sh
+dotnet add package CustomFontSilksong --version 0.1.0
+```
+
 # Getting Started
 
 To create a `TMP_FontAsset`, instantiate <xref:UnityEngine.Font> and use <xref:CustomFont.FontAssetBuilder>.
