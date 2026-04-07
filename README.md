@@ -2,6 +2,10 @@
 
 Replace font with a `.ttf` or `.otf` font. Built for both players and developers.
 
+## Limitation
+
+Not all fonts are replacable. Specifically those in the game menu and pause menu are not replacable, but everything else should do.
+
 ## Player Usage
 
 Install the mod (either manual or via a mod manager) and place a font file named `font.otf` or `font.ttf` in the same folder as the DLL. Your folder structure should look like this:

@@ -1,3 +1,9 @@
+# Introduction
+
+This mod allows you to create `TMProOld.Font_Asset` from `.ttf` and `.otf` fonts, which are used for dialogues and popups.
+
+This mod does not produce a <xref:UnityEngine.Font>. Which means you cannot use this mod to swap fonts on `UnityEngine.UI.Text`.
+
 # Include package
 
 Include the package from [Nuget](https://www.nuget.org/packages/CustomFontSilksong) as follow:
@@ -8,7 +14,7 @@ dotnet add package CustomFontSilksong --version 0.1.0
 
 # Getting Started
 
-To create a `TMP_FontAsset`, instantiate <xref:UnityEngine.Font> and use <xref:CustomFont.FontAssetBuilder>.
+To create a `TMProOld.TMP_FontAsset`, instantiate <xref:UnityEngine.Font> and use <xref:CustomFont.FontAssetBuilder>.
 
 ```cs
 Font font = new Font("your/path/to/font.ttf");
