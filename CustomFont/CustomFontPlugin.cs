@@ -105,7 +105,7 @@ partial class CustomFontPlugin : BaseUnityPlugin
         {
             fontAsset.fallbackFontAssets = [tmpro.font];
         }
-        else if (fontAsset.fallbackFontAssets[0] != tmpro.font)
+        else if (!fontAsset.fallbackFontAssets.Contains(tmpro.font))
         {
             fontAsset.fallbackFontAssets.Insert(0, tmpro.font);
         }
