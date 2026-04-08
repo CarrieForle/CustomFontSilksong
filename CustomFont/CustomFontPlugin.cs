@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
@@ -29,24 +30,29 @@ partial class CustomFontPlugin : BaseUnityPlugin
         harmony = Harmony.CreateAndPatchAll(typeof(Patch), Id);
         logger = Logger;
 
-        configReplaceFontMode = Config.Bind(
-            "General",
-            "ReplaceFontMode",
-            ReplaceFontMode.EffectedByLanguage,
-            Helper.Localized("OPTION_DESCRIPTION_REPLACE_FONT_MODE")
-        );
-        
-        configFontScale = Config.Bind(
-            "General",
-            "FontScale",
-            1f,
-            Helper.Localized("OPTION_DESCRIPTION_FONT_SCALE", 1)
-        );
-
         TryLoadFont([
             Path.Combine(Path.GetDirectoryName(Info.Location), "font.otf"),
             Path.Combine(Path.GetDirectoryName(Info.Location), "font.ttf"),
         ]);
+    }
+
+    private void Start()
+    {
+        harmony.PatchAll(typeof(LanguagePatch));
+
+        configReplaceFontMode = Config.Bind(
+            "General",
+            "ReplaceFontMode",
+            ReplaceFontMode.EffectedByLanguage,
+            Localized("OPTION_DESCRIPTION_REPLACE_FONT_MODE")
+        );
+
+        configFontScale = Config.Bind(
+            "General",
+            "FontScale",
+            1f,
+            Localized("OPTION_DESCRIPTION_FONT_SCALE", 1)
+        );
 
         configReplaceFontMode.SettingChanged += (s, e) =>
         {
@@ -66,11 +72,6 @@ partial class CustomFontPlugin : BaseUnityPlugin
                 configFontScale.Value = 1f;
             }
         };
-    }
-
-    private void Start()
-    {
-        harmony.PatchAll(typeof(LanguagePatch));
     }
 
     private static void TryLoadFont(IEnumerable<string> fontPaths)
@@ -110,8 +111,8 @@ partial class CustomFontPlugin : BaseUnityPlugin
             fontAsset.fallbackFontAssets.Insert(0, tmpro.font);
         }
 
-        tmpro.font = fontAsset;
         tmpro.fontSize = scale;
+        tmpro.font = fontAsset;
     }
 
     internal static void UnpatchTMPro(TMProOld.TextMeshPro tmpro)
@@ -147,6 +148,30 @@ partial class CustomFontPlugin : BaseUnityPlugin
         }
 
         logger.LogDebug($"Patched {tmpros.Length} TMPros in GameCameras");
+    }
+
+    public static string PathOf(GameObject go)
+    {
+        var t = go.transform;
+        var sb = new StringBuilder(t.name);
+
+        while (t.parent != null)
+        {
+            t = t.parent;
+            sb.Insert(0, $"{t.name}/");
+        }
+
+        return sb.ToString();
+    }
+
+    public static LocalisedString Localized(string key)
+    {
+        return new LocalisedString($"Mods.{Id}", key);
+    }
+
+    public static string Localized(string key, params object[] args)
+    {
+        return string.Format(Language.Get(key, $"Mods.{Id}"), args);
     }
 }
 

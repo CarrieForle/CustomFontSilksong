@@ -23,6 +23,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/CarrieForle/CustomFontSilksong</RepositoryUrl>
     <PackageId>CustomFontSilksong</PackageId>
+    <NeutralLanguage>EN</NeutralLanguage>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
