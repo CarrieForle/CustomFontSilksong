@@ -4,15 +4,23 @@ This mod allows you to create `TMProOld.Font_Asset` from `.ttf` and `.otf` fonts
 
 This mod does not produce a <xref:UnityEngine.Font>. Which means you cannot use this mod to swap fonts on `UnityEngine.UI.Text`.
 
-# Include package
+## Include package
 
 Include the package from [Nuget](https://www.nuget.org/packages/CustomFontSilksong) as follow:
 
 ```sh
-dotnet add package CustomFontSilksong --version 0.1.0
+dotnet add package CustomFontSilksong
 ```
 
-# Getting Started
+Add this attribute on top of your plugin class:
+
+```cs
+[BepInDependency("io.github.carrieforle.customfont")]
+```
+
+If you use Thunderstore, make sure to put this as part of the dependencies in the manifest.
+
+## Getting Started
 
 To create a `TMProOld.TMP_FontAsset`, instantiate <xref:UnityEngine.Font> and use <xref:CustomFont.FontAssetBuilder>.
 
