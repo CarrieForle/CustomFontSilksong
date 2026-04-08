@@ -193,6 +193,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       has-nuget-account: ${{ secrets.NUGET_USER != '' }}
-      has-thunderstore-secret: ${{ secrets.THUNDERSTORE_API_KEY != '' }} && false
+      has-thunderstore-secret: ${{ secrets.THUNDERSTORE_API_KEY != '' }}
     steps:
       - run: echo no-op
