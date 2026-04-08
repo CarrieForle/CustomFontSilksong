@@ -24,6 +24,8 @@
     <RepositoryUrl>https://github.com/CarrieForle/CustomFontSilksong</RepositoryUrl>
     <PackageId>CustomFontSilksong</PackageId>
     <NeutralLanguage>EN</NeutralLanguage>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <ProjectUrl>https://carrieforle.github.io/CustomFontSilksong/</ProjectUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
@@ -40,6 +42,7 @@
     <Folder Remove="thunderstore/temp;thunderstore/dist" />
     <None Include="../README.md" Pack="True" PackagePath="README.md" />
     <None Include="thunderstore/icon.png" Pack="True" PackagePath="icon.png" />
+    <None Include="../LICENSE" Pack="True" PackagePath="LICENSE" />
   </ItemGroup>
 
   <Target Name="CopyAndPackageMod" AfterTargets="PostBuildEvent">
