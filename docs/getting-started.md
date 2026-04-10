@@ -1,6 +1,6 @@
 # Introduction
 
-This mod allows you to create `TMProOld.Font_Asset` from `.ttf` and `.otf` fonts, which are used for dialogues and popups.
+This mod allows you to create `TMProOld.TMP_Font_Asset` from `.ttf` and `.otf` fonts, which are used for dialogues and popups.
 
 This mod does not produce a <xref:UnityEngine.Font>, which means you cannot use this mod to swap fonts on `UnityEngine.UI.Text`.
 
