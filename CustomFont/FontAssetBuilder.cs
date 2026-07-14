@@ -113,7 +113,7 @@ public class FontAssetBuilder
 				.Range(0, 0x00ffff)
 				.Select(c => (uint)c);
 
-		if (!newFontAsset.TryAddCharacters(charList.ToArray(), out var missingChars, false))
+		if (!newFontAsset.TryAddCharacters(charList.ToArray(), out var missingChars, true))
 		{
 			var missingCharsStr = new string(missingChars.Select(c => (char)c).ToArray());
 
@@ -137,46 +137,7 @@ public class FontAssetBuilder
 		tmp_FontAsset.atlas = texture2D;
 		logger.LogDebug($"Created {newFontAsset.atlasTextureCount} atlases.");
 
-		TextureFormat textureFormat = ((RenderMode & (GlyphRenderMode)65536) == (GlyphRenderMode)65536) ? TextureFormat.RGBA32 : TextureFormat.Alpha8;
-		int num;
-		if ((RenderMode & (GlyphRenderMode)16) == (GlyphRenderMode)16)
-		{
-			num = 0;
-			Material material;
-			if (textureFormat == TextureFormat.Alpha8)
-			{
-				material = new Material(TextShaderUtilities.ShaderRef_MobileBitmap);
-			}
-			else
-			{
-				material = new Material(Shader.Find("TextMeshPro/Sprite"));
-			}
-			material.SetTexture(TextShaderUtilities.ID_MainTex, texture2D);
-			material.SetFloat(TextShaderUtilities.ID_TextureWidth, (float)AtlasWidth);
-			material.SetFloat(TextShaderUtilities.ID_TextureHeight, (float)AtlasHeight);
-			tmp_FontAsset.material = material;
-		}
-		else
-		{
-			num = 1;
-			Material material2 = new Material(TextShaderUtilities.ShaderRef_MobileSDF);
-			material2.SetTexture(TextShaderUtilities.ID_MainTex, texture2D);
-			material2.SetFloat(TextShaderUtilities.ID_TextureWidth, (float)AtlasWidth);
-			material2.SetFloat(TextShaderUtilities.ID_TextureHeight, (float)AtlasHeight);
-			material2.SetFloat(TextShaderUtilities.ID_GradientScale, (float)(AtlasPadding + num));
-			material2.SetFloat(TextShaderUtilities.ID_WeightNormal, tmp_FontAsset.normalStyle);
-			material2.SetFloat(TextShaderUtilities.ID_WeightBold, tmp_FontAsset.boldStyle);
-			tmp_FontAsset.material = material2;
-		}
-
-		// From ChangeFontByLanguage.defaultMaterial
-		tmp_FontAsset.material.renderQueue = 3000;
-		tmp_FontAsset.material.globalIlluminationFlags =
-			MaterialGlobalIlluminationFlags.None |
-			MaterialGlobalIlluminationFlags.RealtimeEmissive |
-			MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-		/////
-
+		tmp_FontAsset.material = newFontAsset.material;
 		tmp_FontAsset.ReadFontDefinition();
 		FontEngine.UnloadFontFace();
 		return tmp_FontAsset;
