@@ -98,6 +98,23 @@ partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
                 logger.LogWarning("Invalid font scale. Resetted to 1.");
                 configFontScale.Value = 1f;
             }
+
+            if (configReplaceFontMode.Value != ReplaceFontMode.Disabled)
+            {
+                var cfbls = FindObjectsByType<ChangeFontByLanguage>(FindObjectsSortMode.None);
+                foreach (var cfbl in cfbls)
+                {
+                    cfbl.SetFont();
+                }
+
+                if (configReplaceFontMode.Value == ReplaceFontMode.All)
+                {
+                    foreach (var (tmpro, attr) in oldFonts)
+                    {
+                        tmpro.fontSize = attr.FontScale * configFontScale.Value;
+                    }
+                }
+            }
         };
     }
 
