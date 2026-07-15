@@ -135,7 +135,13 @@ partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
                 return;
             }
 
-            logger.LogInfo($"Use font at \"{Path.GetFileName(currentFontPath)}\".");
+            logger.LogInfo($"Using font at \"{Path.GetFileName(currentFontPath)}\".");
+
+            long fileSize = new FileInfo(currentFontPath).Length;
+            if (fileSize > 1e6)
+            {
+                logger.LogWarning($"Font file is large (> {fileSize * 1e-6:F1}MB)! It may take several minutes to to create font atlas.");
+            }
 
             fontAsset = new FontAssetBuilder(new Font(currentFontPath))
             {
