@@ -19,7 +19,7 @@ partial class CustomFontPlugin : BaseUnityPlugin
 {
     internal static ConfigEntry<ReplaceFontMode> configReplaceFontMode;
     internal static ConfigEntry<float> configFontScale;
-    internal static string fontPath;
+    internal static string assemblyPath = "";
     internal static ManualLogSource logger;
     internal static TMProOld.TMP_FontAsset? fontAsset;
     internal static Dictionary<TMProOld.TextMeshPro, (float FontScale, TMProOld.TMP_FontAsset Font)> oldFonts = [];
@@ -29,11 +29,7 @@ partial class CustomFontPlugin : BaseUnityPlugin
     {
         harmony = Harmony.CreateAndPatchAll(typeof(Patch), Id);
         logger = Logger;
-
-        TryLoadFont([
-            Path.Combine(Path.GetDirectoryName(Info.Location), "font.otf"),
-            Path.Combine(Path.GetDirectoryName(Info.Location), "font.ttf"),
-        ]);
+        assemblyPath = Path.GetDirectoryName(Info.Location);
     }
 
     private void Start()
@@ -74,11 +70,16 @@ partial class CustomFontPlugin : BaseUnityPlugin
         };
     }
 
-    private static void TryLoadFont(IEnumerable<string> fontPaths)
+    internal static void TryLoadFont()
     {
+        string[] fontPaths = [
+            Path.Combine(assemblyPath, "font.otf"),
+            Path.Combine(assemblyPath, "font.ttf"),
+        ];
+
         try
         {
-            fontPath = fontPaths
+            string fontPath = fontPaths
                 .FirstOrDefault(fontPath => File.Exists(fontPath));
 
             if (fontPath is null)
@@ -201,7 +202,8 @@ static class Patch
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartNewGame))]
     private static void PatchTMPros()
     {
-		CustomFontPlugin.PatchTMPros();
+        TryLoadFont();
+        CustomFontPlugin.PatchTMPros();
     }
 }
 
