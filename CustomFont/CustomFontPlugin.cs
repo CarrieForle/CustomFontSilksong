@@ -64,7 +64,7 @@ partial class CustomFontPlugin : BaseUnityPlugin
         {
             if (configFontScale.Value <= 0)
             {
-                logger.LogError("Invalid font scale. Resetted to 1.");
+                logger.LogWarning("Invalid font scale. Resetted to 1.");
                 configFontScale.Value = 1f;
             }
         };
@@ -87,6 +87,8 @@ partial class CustomFontPlugin : BaseUnityPlugin
                 logger.LogInfo("No font found.");
                 return;
             }
+
+            logger.LogInfo($"Use font at \"{Path.GetFileName(fontPath)}\".");
 
             fontAsset = new FontAssetBuilder(new Font(fontPath))
             {
