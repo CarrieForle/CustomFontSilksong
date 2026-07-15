@@ -24,11 +24,11 @@ jobs:
       with:
         dotnet-version: 10.x
     - run: dotnet tool restore
-    - run: dotnet docfx docfx.json
+    - run: dotnet docfx docfx/docfx.json
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v5
       with:
-        path: '_site'
+        path: 'docfx/_site'
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v5

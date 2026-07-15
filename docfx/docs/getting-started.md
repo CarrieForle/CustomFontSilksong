@@ -1,3 +1,7 @@
+---
+title: Getting Started
+---
+
 # Introduction
 
 This mod allows you to create `TMProOld.TMP_Font_Asset` from `.ttf` and `.otf` fonts, which are used for dialogues and popups.

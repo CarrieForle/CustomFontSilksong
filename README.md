@@ -53,5 +53,5 @@ dotnet build -c Release
 
 ```sh
 dotnet tool restore
-dotnet docfx docfx.json --serve
+dotnet docfx docfx/docfx.json --serve
 ```
