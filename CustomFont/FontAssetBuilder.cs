@@ -110,7 +110,7 @@ public class FontAssetBuilder
 
 		IEnumerable<uint>? charList = CharList
 			?.Select(ch => (uint)ch) ?? Enumerable
-				.Range(0, 0x00ffff)
+				.Range(0, 0x10ffff)
 				.Select(c => (uint)c);
 
 		if (!newFontAsset.TryAddCharacters(charList.ToArray(), out var missingChars, true))
