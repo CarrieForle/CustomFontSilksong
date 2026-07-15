@@ -141,35 +141,28 @@ partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
             return;
         }
 
-        try
+        currentFontPath = fontPaths
+            .FirstOrDefault(fontPath => File.Exists(fontPath));
+
+        if (currentFontPath is null)
         {
-            currentFontPath = fontPaths
-                .FirstOrDefault(fontPath => File.Exists(fontPath));
-
-            if (currentFontPath is null)
-            {
-                logger.LogInfo("No font found.");
-                return;
-            }
-
-            logger.LogInfo($"Using font at \"{Path.GetFileName(currentFontPath)}\".");
-
-            long fileSize = new FileInfo(currentFontPath).Length;
-            if (fileSize > 1e6)
-            {
-                logger.LogWarning($"Font file is large (> {fileSize * 1e-6:F1}MB)! It may take several minutes to to create font atlas.");
-            }
-
-            fontAsset = new FontAssetBuilder(new Font(currentFontPath))
-            {
-                AtlasHeight = 4096,
-                AtlasWidth = 4096,
-            }.Create();
+            logger.LogInfo("No font found.");
+            return;
         }
-        catch (Exception ex)
+
+        logger.LogInfo($"Using font at \"{Path.GetFileName(currentFontPath)}\".");
+
+        long fileSize = new FileInfo(currentFontPath).Length;
+        if (fileSize > 1e6)
         {
-            logger.LogError($"Error while loading font: {ex.Message}\n{ex.StackTrace}");
+            logger.LogWarning($"Font file is large (> {fileSize * 1e-6:F1}MB)! It may take several minutes to to create font atlas.");
         }
+
+        fontAsset = new FontAssetBuilder(new Font(currentFontPath))
+        {
+            AtlasHeight = 4096,
+            AtlasWidth = 4096,
+        }.Create();
     }
 
     internal static void PatchTMPro(TMProOld.TextMeshPro tmpro, float scale, Material sourceMaterial)
