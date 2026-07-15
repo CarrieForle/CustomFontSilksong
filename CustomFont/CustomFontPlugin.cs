@@ -1,3 +1,7 @@
+/*
+Skip cutscene prompt in the title is UnityEngine.UI.Text
+*/
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,27 +19,48 @@ namespace CustomFont;
 
 [BepInDependency("org.silksong-modding.i18n")]
 [BepInAutoPlugin(id: "io.github.carrieforle.customfont")]
-partial class CustomFontPlugin : BaseUnityPlugin
+partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
 {
     internal static ConfigEntry<ReplaceFontMode> configReplaceFontMode;
     internal static ConfigEntry<float> configFontScale;
-    internal static string assemblyPath = "";
     internal static ManualLogSource logger;
     internal static TMProOld.TMP_FontAsset? fontAsset;
     internal static Dictionary<TMProOld.TextMeshPro, (float FontScale, TMProOld.TMP_FontAsset Font)> oldFonts = [];
+    private static string[] fontPaths = [];
+    private static string? currentFontPath;
+    private FileSystemWatcher fontWatcher;
     private Harmony harmony;
 
     private void Awake()
     {
         harmony = Harmony.CreateAndPatchAll(typeof(Patch), Id);
         logger = Logger;
-        assemblyPath = Path.GetDirectoryName(Info.Location);
+
+        string assemblyPath = Path.GetDirectoryName(Info.Location);
+        fontPaths = [
+            Path.Combine(assemblyPath, "font.otf"),
+            Path.Combine(assemblyPath, "font.ttf"),
+        ];
+
+        fontWatcher = new(assemblyPath)
+		{
+			NotifyFilter = NotifyFilters.CreationTime |
+                NotifyFilters.FileName |
+                NotifyFilters.LastWrite |
+                NotifyFilters.Size
+		};
+
+		fontWatcher.Changed += (s, e) => OnFileChanged(e.FullPath, e.FullPath);
+        fontWatcher.Created += (s, e) => OnFileChanged(null, e.FullPath);
+        fontWatcher.Deleted += (s, e) => OnFileChanged(e.FullPath, null);
+        fontWatcher.Renamed += (s, e) => OnFileChanged(e.OldFullPath, e.FullPath);
+        fontWatcher.EnableRaisingEvents = true;
+
+        TryLoadFont();
     }
 
     private void Start()
     {
-        harmony.PatchAll(typeof(LanguagePatch));
-
         configReplaceFontMode = Config.Bind(
             "General",
             "ReplaceFontMode",
@@ -52,7 +77,13 @@ partial class CustomFontPlugin : BaseUnityPlugin
 
         configReplaceFontMode.SettingChanged += (s, e) =>
         {
-            PatchTMPros();
+            TryUnpatchTMPros();
+
+            if (configReplaceFontMode.Value == ReplaceFontMode.All)
+            {
+                TryPatchTMPros();
+            }
+
             var cfbls = FindObjectsByType<ChangeFontByLanguage>(FindObjectsSortMode.None);
             foreach (var cfbl in cfbls)
             {
@@ -70,27 +101,43 @@ partial class CustomFontPlugin : BaseUnityPlugin
         };
     }
 
+    private void OnFileChanged(string? oldFilePath, string? newFilePath)
+    {
+        if (currentFontPath is not null &&
+            ((oldFilePath is not null && fontPaths.Contains(oldFilePath)) ||
+            (newFilePath is not null && fontPaths.Contains(newFilePath))))
+        {
+            logger.LogInfo("Detected font file changed. Prepare to reload font.");
+            currentFontPath = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        fontWatcher.Dispose();
+    }
+
     internal static void TryLoadFont()
     {
-        string[] fontPaths = [
-            Path.Combine(assemblyPath, "font.otf"),
-            Path.Combine(assemblyPath, "font.ttf"),
-        ];
+        if (currentFontPath is not null)
+        {
+            return;
+        }
 
         try
         {
-            string fontPath = fontPaths
+            currentFontPath = fontPaths
                 .FirstOrDefault(fontPath => File.Exists(fontPath));
 
-            if (fontPath is null)
+            if (currentFontPath is null)
             {
                 logger.LogInfo("No font found.");
                 return;
             }
 
-            logger.LogInfo($"Use font at \"{Path.GetFileName(fontPath)}\".");
+            logger.LogInfo($"Use font at \"{Path.GetFileName(currentFontPath)}\".");
 
-            fontAsset = new FontAssetBuilder(new Font(fontPath))
+            fontAsset = new FontAssetBuilder(new Font(currentFontPath))
             {
                 AtlasHeight = 4096,
                 AtlasWidth = 4096,
@@ -102,7 +149,7 @@ partial class CustomFontPlugin : BaseUnityPlugin
         }
     }
 
-    internal static void PatchTMPro(TMProOld.TextMeshPro tmpro, float scale)
+    internal static void PatchTMPro(TMProOld.TextMeshPro tmpro, float scale, Material sourceMaterial)
     {
         fontAsset!.fallbackFontAssets = tmpro.font.fallbackFontAssets;
         if (fontAsset.fallbackFontAssets.IsNullOrEmpty())
@@ -116,6 +163,29 @@ partial class CustomFontPlugin : BaseUnityPlugin
 
         tmpro.fontSize = scale;
         tmpro.font = fontAsset;
+
+        Debug.Assert(fontAsset.material == tmpro.fontSharedMaterial);
+
+        Material oldMaterial = TMProOld.TMP_MaterialManager.GetFallbackMaterial(sourceMaterial, tmpro.fontSharedMaterial);
+        tmpro.fontSharedMaterial = oldMaterial;
+    }
+
+    internal static void TryPatchTMPros()
+    {
+        if (fontAsset == null || configReplaceFontMode.Value != ReplaceFontMode.All)
+        {
+            return;
+        }
+
+        logger.LogInfo($"Patching {oldFonts.Count} TMPro");
+        oldFonts = oldFonts
+            .Where(t => t.Key != null)
+            .ToDictionary(t => t.Key, t => t.Value);
+
+        foreach (var (tmpro, attr) in oldFonts)
+        {
+            PatchTMPro(tmpro, attr.FontScale * configFontScale.Value, tmpro.fontSharedMaterial);
+        }
     }
 
     internal static void UnpatchTMPro(TMProOld.TextMeshPro tmpro)
@@ -125,32 +195,22 @@ partial class CustomFontPlugin : BaseUnityPlugin
         tmpro.fontSize = fontAttr.FontScale;
     }
 
-    internal static void PatchTMPros()
+    internal static void TryUnpatchTMPros()
     {
         if (fontAsset == null)
         {
             return;
         }
 
-        var tmpros = GameCameras.SilentInstance.hudCamera.gameObject.GetComponentsInChildren<TMProOld.TextMeshPro>(true);
-        foreach (var tmpro in tmpros)
-        {
-            oldFonts.TryAdd(tmpro, (tmpro.fontSize, tmpro.font));
-        }
+        logger.LogInfo($"Unpatching {oldFonts.Count} TMPro");
+        oldFonts = oldFonts
+            .Where(t => t.Key != null)
+            .ToDictionary(t => t.Key, t => t.Value);
 
-        foreach (var tmpro in tmpros)
+        foreach (var (tmpro, _) in oldFonts)
         {
-            if (configReplaceFontMode.Value == ReplaceFontMode.All)
-            {
-                PatchTMPro(tmpro, oldFonts[tmpro].FontScale * configFontScale.Value);
-            }
-            else
-            {
-                UnpatchTMPro(tmpro);
-            }
+            UnpatchTMPro(tmpro);
         }
-
-        logger.LogDebug($"Patched {tmpros.Length} TMPros in GameCameras");
     }
 
     public static string PathOf(GameObject go)
@@ -192,10 +252,7 @@ static class Patch
             return;
         }
 
-        PatchTMPro(__instance.tmpro, __instance.tmpro.fontSize * configFontScale.Value);
-        Material fallbackMaterial = TMProOld.TMP_MaterialManager.GetFallbackMaterial(__instance.defaultMaterial, __instance.tmpro.fontSharedMaterial);
-        __instance.FallbackMaterialReference = fallbackMaterial;
-        __instance.tmpro.fontSharedMaterial = fallbackMaterial;
+        PatchTMPro(__instance.tmpro, __instance.tmpro.fontSize * configFontScale.Value, __instance.defaultMaterial);
     }
 
     [HarmonyPostfix]
@@ -205,17 +262,30 @@ static class Patch
     private static void PatchTMPros()
     {
         TryLoadFont();
-        CustomFontPlugin.PatchTMPros();
+        TryPatchTMPros();
     }
-}
 
-static class LanguagePatch
-{
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(Language), nameof(Language.DoSwitch))]
-    private static void ClearOldFonts()
+    [HarmonyPriority(Priority.HigherThanNormal)]
+    [HarmonyPatch(typeof(TMProOld.TextMeshPro), nameof(TMProOld.TextMeshPro.Awake))]
+    private static void RecordAndPatchTMPro(TMProOld.TextMeshPro __instance)
     {
-        oldFonts.Clear();
+        oldFonts.TryAdd(__instance, (__instance.fontSize, __instance.font));
+
+        if (fontAsset == null || configReplaceFontMode.Value != ReplaceFontMode.All)
+        {
+            return;
+        }
+
+        PatchTMPro(__instance, __instance.fontSize * configFontScale.Value, __instance.fontSharedMaterial);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.HigherThanNormal)]
+    [HarmonyPatch(typeof(ChangeFontByLanguage), nameof(ChangeFontByLanguage.Awake))]
+    private static void ExcludeCfbl(ChangeFontByLanguage __instance)
+    {
+        oldFonts.Remove(__instance.tmpro);
     }
 }
 
