@@ -1,6 +1,6 @@
 # CustomFont
 
-Replace font with a `.ttf` or `.otf` font. Built for both players and developers.
+Replace font with a OpenType or TrueType font. Built for both players and developers.
 
 ## Limitation
 
@@ -24,6 +24,31 @@ Install the mod (either manual or via a mod manager) and place a font file named
 ```
 
 If you use a mod manager (e.g., r2modman), the above structure should be in a profile folder. If you installed BepinEx manually, it should be in the Silksong installation folder.
+
+### Options
+
+Go to Options > Mods > Custom Font
+
+#### All Chars Atlas
+
+The created font atlas includes characters that are not seen in the game. If this is off then it only includes characters that are seen in the game
+
+> [!WARNING]
+> Enabling this option will cause noticeable load delay if the font file is large (> 1MB), which can take from seconds up to several minutes. The change will take effect when you load a save file.
+
+#### Font Scale
+
+The scale of font size e.g., 1.5 means 150% bigger.
+
+### Replace Font Mode
+
+Where to apply custom font
+- Disabled: don't apply custom font
+- Effected by language: only apply custom font to texts that are effected by languages e.g., dialogues. Texts such as number of items, button prompt are not applied
+- All: apply custom font for all possible texts
+
+> [!NOTE]
+> Even when you use "All", texts in the menues and some cutscenes remain unchanged as they use different UI toolkits which this mod does not cover.
 
 ## Developer Usage
 

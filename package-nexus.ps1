@@ -1,7 +1,7 @@
 # Used for Nexux CD. Pass BUILD_DIR envvar for dll location
 
 $name = "CarrieForle-CustomFont"
-$modUrl = "https://thunderstore.io/package/download/silksong_modding/I18N/1.0.3/"
+$modUrl = "https://thunderstore.io/package/download/silksong_modding/I18N/1.1.1/"
 $licenseUrl = "https://raw.githubusercontent.com/silksong-modding/Silksong.I18N/refs/heads/main/LICENSE"
 $depName = "silksong_modding-I18N"
 $binDir = "$PSScriptRoot/bin"

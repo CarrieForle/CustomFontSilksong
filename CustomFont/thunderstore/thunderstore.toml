@@ -5,7 +5,7 @@ schemaVersion = "0.0.1"
 # The name of the team you are publishing as
 namespace = "CarrieForle"
 # max 250 characters
-description = "Replace font with a `.ttf` or `.otf` font. Built for both players and developers."
+description = "Replace font with a OpenType or TrueType font file"
 
 # Replace this with a correct repo URL if the default is not accurate
 websiteUrl = "https://github.com/CarrieForle/CustomFontSilksong"
@@ -14,7 +14,7 @@ containsNsfwContent = false
 # dependencies are specified in the format AuthorName-PackageName = "version". You should always have at least BepInExPack_Silksong.
 [package.dependencies]
 silksong_modding-BepInExPack_Silksong = "1.0.3"
-silksong_modding-I18N = "1.1.0"
+silksong_modding-I18N = "1.1.1"
 
 # in most cases you should not change this build block, or the first build.copy block; the dist and tmp directories are used
 # by other build scripts
@@ -39,4 +39,4 @@ communities = [ "hollow-knight-silksong" ]
 
 [publish.categories]
 # available categories can be found at https://github.com/thunderstore-io/ecosystem-schema/blob/master/games/data/hollow-knight-silksong.yml
-hollow-knight-silksong = [ "mods", "utility", "cosmetic" ]
+hollow-knight-silksong = [ "mods", "libraries", "cosmetic" ]
