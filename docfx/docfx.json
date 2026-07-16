@@ -37,6 +37,7 @@
       "pdf": false
     },
     "xref": [
+      "https://learn.microsoft.com/en-us/dotnet/.xrefmap.json",
       "https://normanderwan.github.io/UnityXrefMaps/6000.0/xrefmap.yml"
     ]
   }

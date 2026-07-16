@@ -1,3 +1,3 @@
 ---
-redirect_url: docs/getting-started
+redirect_url: docs/introduction.html
 ---

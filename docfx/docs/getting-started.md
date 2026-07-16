@@ -2,28 +2,6 @@
 title: Getting Started
 ---
 
-# Introduction
-
-This mod allows you to create `TMProOld.TMP_Font_Asset` from `.ttf` and `.otf` fonts, which are used for dialogues and popups.
-
-This mod does not produce a <xref:UnityEngine.Font>, which means you cannot use this mod to swap fonts on `UnityEngine.UI.Text`.
-
-## Include package
-
-Include the package from [Nuget](https://www.nuget.org/packages/CustomFontSilksong) as follow:
-
-```sh
-dotnet add package CustomFontSilksong
-```
-
-Add this attribute on top of your plugin class:
-
-```cs
-[BepInDependency("io.github.carrieforle.customfont")]
-```
-
-If you use Thunderstore, make sure to put this as part of the dependencies in the manifest.
-
 ## Getting Started
 
 To create a `TMProOld.TMP_FontAsset`, instantiate <xref:UnityEngine.Font> and use <xref:CustomFont.FontAssetBuilder>.
@@ -41,3 +19,9 @@ catch (CustomFontException ex)
 ```
 
 <xref:CustomFont.FontAssetBuilder> has multiple properties that can be set to configure font asset creation during <xref:CustomFont.FontAssetBuilder.Create>. Most properties are directly passed to the underlying `FontAsset.CreateFontAsset()`.
+
+## Character List
+
+By default, all characters in the font are included in the font asset. This will cause a poor performance if you have a large font file (> 1MB) upon calling <xref:CustomFont.FontAssetBuilder.Create>. Fonts like CJK are especially large, containing thousands of glyphs, and it can take several minutes just for the method to finish.
+
+One way to improve the performance is specifying which characters to be included by assigning <xref:CustomFont.FontAssetBuilder.CharList>. You can also use <xref:CustomFont.FontAssetBuilder.AddChars(System.Collections.Generic.ISet{System.UInt32})> and its overloaded methods to limit the characters to be included. These two are not mutually exclusive. You can use both at the same time.
