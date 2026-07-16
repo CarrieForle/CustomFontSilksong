@@ -1,4 +1,5 @@
 {
 	"OPTION_DESCRIPTION_REPLACE_FONT_MODE": "Where to apply custom font",
-	"OPTION_DESCRIPTION_FONT_SCALE": "The scale of font size e.g., 1.5 means 150% bigger (Default: {0})"
+	"OPTION_DESCRIPTION_FONT_SCALE": "The scale of font size e.g., 1.5 means 150% bigger (Default: {0})",
+	"OPTION_DESCRIPTION_ALL_CHARS_ATLAS": "The created font atlas includes characters that are not seen in the game"
 }

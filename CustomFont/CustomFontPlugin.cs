@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
@@ -23,6 +24,7 @@ partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
 {
     internal static ConfigEntry<ReplaceFontMode> configReplaceFontMode;
     internal static ConfigEntry<float> configFontScale;
+    private static ConfigEntry<bool> configAllCharsAtlas;
     internal static ManualLogSource logger;
     internal static TMProOld.TMP_FontAsset? fontAsset;
     internal static Dictionary<TMProOld.TextMeshPro, (float FontScale, TMProOld.TMP_FontAsset Font)> oldFonts = [];
@@ -55,8 +57,6 @@ partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
         fontWatcher.Deleted += (s, e) => OnFileChanged(e.FullPath, null);
         fontWatcher.Renamed += (s, e) => OnFileChanged(e.OldFullPath, e.FullPath);
         fontWatcher.EnableRaisingEvents = true;
-
-        TryLoadFont();
     }
 
     private void Start()
@@ -73,6 +73,13 @@ partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
             "FontScale",
             1f,
             Localized("OPTION_DESCRIPTION_FONT_SCALE", 1)
+        );
+
+        configAllCharsAtlas = Config.Bind(
+            "General",
+            "AllCharsAtlas",
+            false,
+            Localized("OPTION_DESCRIPTION_ALL_CHARS_ATLAS")
         );
 
         configReplaceFontMode.SettingChanged += (s, e) =>
@@ -116,6 +123,13 @@ partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
                 }
             }
         };
+
+        configAllCharsAtlas.SettingChanged += (s, e) =>
+        {
+            currentFontPath = null;
+        };
+
+        TryLoadFont();
     }
 
     private void OnFileChanged(string? oldFilePath, string? newFilePath)
@@ -150,7 +164,7 @@ partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
             return;
         }
 
-        logger.LogInfo($"Using font at \"{Path.GetFileName(currentFontPath)}\".");
+        logger.LogInfo($"Loading font at \"{Path.GetFileName(currentFontPath)}\".");
 
         long fileSize = new FileInfo(currentFontPath).Length;
         if (fileSize > 1e6)
@@ -158,11 +172,39 @@ partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
             logger.LogWarning($"Font file is large (> {fileSize * 1e-6:F1}MB)! It may take several minutes to to create font atlas.");
         }
 
-        fontAsset = new FontAssetBuilder(new Font(currentFontPath))
+        var fab = new FontAssetBuilder(new Font(currentFontPath))
         {
-            AtlasHeight = 4096,
-            AtlasWidth = 4096,
-        }.Create();
+            AtlasHeight = 8192,
+            AtlasWidth = 8192,
+            SamplingPointSize = 70,
+            AtlasPadding = 7,
+        };
+
+        if (!configAllCharsAtlas.Value)
+        {
+            fab.AddChars(32, 126)
+                .AddChars(128, 254);
+
+            foreach (string text in Language.Settings.sheetTitles)
+            {
+                string languageFileContents = Language.GetLanguageFileContents(text);
+                if (!string.IsNullOrEmpty(languageFileContents))
+                {
+                    using XmlReader xmlReader = XmlReader.Create(new StringReader(languageFileContents));
+                    while (xmlReader.ReadToFollowing("entry"))
+                    {
+                        xmlReader.MoveToFirstAttribute();
+                        string value = xmlReader.Value;
+                        xmlReader.MoveToElement();
+                        string text2 = xmlReader.ReadElementContentAsString().Trim();
+                        text2 = text2.UnescapeXml();
+                        fab.AddChars(text2);
+                    }
+                }
+            }
+        }
+
+        fontAsset = fab.Create();
     }
 
     internal static void PatchTMPro(TMProOld.TextMeshPro tmpro, float scale, Material sourceMaterial)
