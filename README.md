@@ -31,18 +31,18 @@ Go to Options > Mods > Custom Font
 
 #### All Chars Atlas
 
-The created font atlas includes characters that are not seen in the game. If this is off then it only includes characters that are seen in the game
+The created font atlas includes characters that are not seen in the game. If this is off then it only includes characters that are seen in the game. The change will take effect when you load a save file.
 
 > [!WARNING]
-> Enabling this option will cause noticeable load delay if the font file is large (> 1MB), which can take from seconds up to several minutes. The change will take effect when you load a save file.
+> Enabling this option will cause noticeable load delay if the font file is large (> 1MB), which can take from seconds up to several minutes.
 
 #### Font Scale
 
 The scale of font size e.g., 1.5 means 150% bigger.
 
-### Replace Font Mode
+#### Replace Font Mode
 
-Where to apply custom font
+Where to apply custom font:
 - Disabled: don't apply custom font
 - Effected by language: only apply custom font to texts that are effected by languages e.g., dialogues. Texts such as number of items, button prompt are not applied
 - All: apply custom font for all possible texts
