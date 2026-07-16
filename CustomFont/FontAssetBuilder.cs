@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
@@ -21,9 +22,9 @@ public class FontAssetBuilder
 
 	/// <summary>
 	/// The characters to be included in the font asset.
-	/// If this is null, all characters are included.
+	/// If this is empty, all characters are included.
 	/// </summary>
-	public ICollection<char>? CharList { get; set; }
+	public ISet<uint> CharList { get; set; } = new HashSet<uint>();
 
 	/// <summary>
 	/// A parameter directly passed to `FontAsset.CreateFontAsset()`.
@@ -108,10 +109,12 @@ public class FontAssetBuilder
 		tmp_FontAsset.name = Font.name;
 		tmp_FontAsset.fallbackFontAssets = [];
 
-		IEnumerable<uint>? charList = CharList
-			?.Select(ch => (uint)ch) ?? Enumerable
-				.Range(0, 0x10ffff)
-				.Select(c => (uint)c);
+		IEnumerable<uint>? charList = CharList;
+
+		if (!charList.Any())
+		{
+			charList = Enumerable.Range(0, 0x10ffff).Select(c => (uint)c);
+		}
 
 		if (!newFontAsset.TryAddCharacters(charList.ToArray(), out var missingChars, true))
 		{
@@ -141,6 +144,65 @@ public class FontAssetBuilder
 		tmp_FontAsset.ReadFontDefinition();
 		FontEngine.UnloadFontFace();
 		return tmp_FontAsset;
+	}
+
+	/// <summary>
+	/// Add a sequence of characters to font asset. If there are duplicate characters, only one of them is added.
+	/// </summary>
+	/// <param name="chars">The sequence of characters to add</param>
+	/// <returns>The <see cref="FontAssetBuilder"/> that calls this method</returns>
+	public FontAssetBuilder AddChars(string chars)
+	{
+		HashSet<uint> unicodes = [];
+
+		for (int i = 0; i < chars.Length; i++)
+		{
+			uint ch = chars[i];
+			if (char.IsHighSurrogate(chars, i))
+			{
+				ch = (uint)char.ConvertToUtf32(chars[i], chars[i + 1]);
+				i++;
+			}
+
+			unicodes.Add(ch);
+		}
+
+		return AddChars(unicodes);
+	}
+
+	/// <summary>
+	/// Add unicode code points to font asset.
+	/// It's caller's responsibility to ensure the code points are valid.
+	/// </summary>
+	/// <param name="charList">A set of valid unicode code point</param>
+	/// <returns>The <see cref="FontAssetBuilder"/> that calls this method</returns>
+	public FontAssetBuilder AddChars(ISet<uint> unicodes)
+	{
+		CharList = CharList.Union(unicodes).ToHashSet();
+
+		return this;
+	}
+
+	/// <summary>
+	/// Add range of unicode code points to font asset (inclusive-inclusive).
+	/// It's caller's responsibility to ensure the range does not include invalid code points.
+	/// </summary>
+	/// <param name="start">The start of the range (inclusive)</param>
+	/// <param name="end">The end of the range (inclusive)</param>
+	/// <returns>The <see cref="FontAssetBuilder"/> that calls this method</returns>
+	/// <exception cref="ArgumentException"><paramref name="start"/> is greater than or equal to <paramref name="end"/></exception>
+	public FontAssetBuilder AddChars(uint start, uint end)
+	{
+		if (start >= end)
+		{
+			throw new ArgumentException($"start({start}) is greater than or equal to end({end})");
+		}
+
+		CharList = CharList.Union(
+			Enumerable.Range((int)start, (int)end).Select(u => (uint)u)
+		).ToHashSet();
+
+		return this;
 	}
 
 	// https://docs.unity3d.com/Manual/UIE-font-asset-properties.html
