@@ -246,11 +246,11 @@ jobs:
       uses: softprops/action-gh-release@v3
       with:
         draft: false
-        generate_release_notes: true
         fail_on_unmatched_files: true
         tag_name: v${{ needs.build.outputs.version }}
         body: |
           Build attested at ${{ needs.build.outputs.attestation-url }}
+          [Changelog](https://carrieforle.github.io/CustomFontSilksong/changelog.html)
         files: |
           *.zip
 
