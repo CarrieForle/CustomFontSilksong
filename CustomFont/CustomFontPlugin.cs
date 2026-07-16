@@ -176,8 +176,6 @@ partial class CustomFontPlugin : BaseUnityPlugin, IDisposable
         {
             AtlasHeight = 8192,
             AtlasWidth = 8192,
-            SamplingPointSize = 70,
-            AtlasPadding = 7,
         };
 
         if (!configAllCharsAtlas.Value)
