@@ -120,7 +120,7 @@ public class FontAssetBuilder
 		{
 			var missingCharsStr = new string(missingChars.Select(c => (char)c).ToArray());
 
-			if (CharList is not null)
+			if (CharList.Any())
 			{
 				logger.LogWarning($"Failed to add characters: \"{missingCharsStr}\". These will not be rendered.");
 			}
