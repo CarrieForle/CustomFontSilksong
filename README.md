@@ -45,7 +45,7 @@ The scale of font size e.g., 1.5 means 150% bigger.
 Where to apply custom font:
 - Disabled: don't apply custom font
 - Effected by language: only apply custom font to texts that are effected by languages e.g., dialogues. Texts such as number of items, button prompt are not applied
-- All: apply custom font for all possible texts
+- All: apply custom font for all possible texts (experimental)
 
 > [!NOTE]
 > Even when you use "All", texts in the menues and some cutscenes remain unchanged as they use different UI toolkits which this mod does not cover.
