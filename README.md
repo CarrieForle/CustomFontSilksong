@@ -1,5 +1,7 @@
 # CustomFont
 
+[Thunderstore](https://thunderstore.io/c/hollow-knight-silksong/p/CarrieForle/CustomFont/) [NexusMods](https://www.nexusmods.com/hollowknightsilksong/mods/1021)
+
 Replace font with a OpenType or TrueType font. Built for both players and developers.
 
 ## Limitation
