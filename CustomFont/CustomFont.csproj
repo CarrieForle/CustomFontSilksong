@@ -26,7 +26,6 @@
     <NeutralLanguage>EN</NeutralLanguage>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <ProjectUrl>https://carrieforle.github.io/CustomFontSilksong/</ProjectUrl>
-    <Version>0.1.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
