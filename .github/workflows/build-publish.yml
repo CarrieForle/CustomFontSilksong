@@ -209,7 +209,7 @@ jobs:
       uses: Nexus-Mods/upload-action@v1.0.0-beta.9
       with:
         api_key: ${{ secrets.NEXUSMODS_API_KEY }}
-        file_group_id: ${{ secrets.NEXUSMODS_GROUP }}
+        file_id: ${{ secrets.NEXUSMODS_GROUP }}
         filename: CarrieForle-CustomFont.zip
         display_name: CustomFont
         description: Includes just this mod. You need to install dependencies manually.
@@ -221,7 +221,7 @@ jobs:
       uses: Nexus-Mods/upload-action@v1.0.0-beta.9
       with:
         api_key: ${{ secrets.NEXUSMODS_API_KEY }}
-        file_group_id: ${{ secrets.NEXUSMODS_GROUP_ALL_IN_ONE }}
+        file_id: ${{ secrets.NEXUSMODS_GROUP_ALL_IN_ONE }}
         filename: bin/nexus/CarrieForle-CustomFont.zip
         display_name: CustomFont all in one
         description: Included this mod and the dependencies. Just unzip and drag and drop into BepinEx folder.
