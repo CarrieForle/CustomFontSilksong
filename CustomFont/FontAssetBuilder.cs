@@ -27,37 +27,36 @@ public class FontAssetBuilder
 	public ISet<uint> CharList { get; set; } = new HashSet<uint>();
 
 	/// <summary>
-	/// A parameter directly passed to `FontAsset.CreateFontAsset()`.
 	/// Default: `0`
 	/// </summary>
 	public int FaceIndex { get; set; } = 0;
 
 	/// <summary>
-	/// A parameter directly passed to `FontAsset.CreateFontAsset()`.
+	/// The font size of characters in the font atlas.
 	/// Default: `90`
 	/// </summary>
 	public int SamplingPointSize { get; set; } = 90;
 
 	/// <summary>
-	/// A parameter directly passed to `FontAsset.CreateFontAsset()`.
+	/// The gap (padding) between characters in the font atlas.
 	/// Default: `9`
 	/// </summary>
 	public int AtlasPadding { get; set; } = 9;
 
 	/// <summary>
-	/// A parameter directly passed to `FontAsset.CreateFontAsset()`.
-	/// Default: `GlyphRenderMode.SDFAA`
+	/// The render mode of the font atlas.
+	/// Default: <see cref="GlyphRenderMode.SDFAA"/>
 	/// </summary>
 	public GlyphRenderMode RenderMode { get; set; } = GlyphRenderMode.SDFAA;
 
 	/// <summary>
-	/// A parameter directly passed to `FontAsset.CreateFontAsset()`.
+	/// The width of the font atlas.
 	/// Default: `1024`
 	/// </summary>
 	public int AtlasWidth { get; set; } = 1024;
 
 	/// <summary>
-	/// A parameter directly passed to `FontAsset.CreateFontAsset()`.
+	/// The height of the font atlas.
 	/// Default: `1024`
 	/// </summary>
 	public int AtlasHeight { get; set; } = 1024;
@@ -171,10 +170,9 @@ public class FontAssetBuilder
 	}
 
 	/// <summary>
-	/// Add unicode code points to font asset.
-	/// It's caller's responsibility to ensure the code points are valid.
+	/// Add unicode scalar values to font asset.
 	/// </summary>
-	/// <param name="charList">A set of valid unicode code point</param>
+	/// <param name="charList">A set of valid unicode scalar value</param>
 	/// <returns>The <see cref="FontAssetBuilder"/> that calls this method</returns>
 	public FontAssetBuilder AddChars(ISet<uint> unicodes)
 	{
@@ -184,8 +182,7 @@ public class FontAssetBuilder
 	}
 
 	/// <summary>
-	/// Add range of unicode code points to font asset (inclusive-inclusive).
-	/// It's caller's responsibility to ensure the range does not include invalid code points.
+	/// Add range of unicode scalar values to font asset (inclusive-inclusive).
 	/// </summary>
 	/// <param name="start">The start of the range (inclusive)</param>
 	/// <param name="end">The end of the range (inclusive)</param>
@@ -211,7 +208,7 @@ public class FontAssetBuilder
 		Dictionary<uint, uint> glyphToUnicode = [];
 		HashSet<uint> excludeGlyphs = [];
 
-		// There might be multiple unicode code point for a glyph
+		// There might be multiple unicode scalar value for a glyph
 		foreach (var ch in fontAsset.characterTable)
 		{
 			if (!glyphToUnicode.TryAdd(ch.glyphIndex, ch.unicode))

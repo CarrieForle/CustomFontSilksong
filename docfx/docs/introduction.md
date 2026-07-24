@@ -4,9 +4,12 @@ title: Introduction
 
 ## Introduction
 
-This mod allows you to create `TMProOld.TMP_Font_Asset` from OpenType (`otf`) or TrueType (`.ttf`) fonts from a file, which are used for texts in places such as inventory, dialogues, HUD.
+Silksong uses TextMeshPro to render various texts in places such as dialogues, HUD, and cutscenes. The game uses a rather old version of TextMeshPro which does not have a way to instantiate `TMProOld.TMP_FontAsset` at runtime.
 
-This mod does not produce a <xref:UnityEngine.Font>, which means you cannot use this mod to swap fonts on `UnityEngine.UI.Text`.
+This mod allows you to instantiate `TMProOld.TMP_FontAsset` from OpenType (`.otf`) or TrueType (`.ttf`) fonts from a file to replace fonts.
+
+> [!NOTE]
+> Do not confuse `TMP_FontAsset` with `FontAsset`. The former is what Silksong uses (namespace `TMProOld`) and it's what you're supposed to replace. The latter is the built-in, newer version in Unity (namespace `UnityEngine.TextCore.Text`).
 
 ## Include Package
 
