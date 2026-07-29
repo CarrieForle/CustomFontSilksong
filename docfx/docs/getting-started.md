@@ -60,7 +60,7 @@ string s = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 Font font = new Font("font.ttf");
 TMProOld.TMP_FontAsset fontAsset = new FontAssetBuilder(font)
-    .AddChar(s)
+    .AddChars(s)
     .Create();
 ```
 
