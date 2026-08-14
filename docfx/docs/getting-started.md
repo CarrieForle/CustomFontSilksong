@@ -48,7 +48,7 @@ for (uint i = 65; i <= 90; i++)
 }
 
 Font font = new Font("font.ttf");
-FontAssetBuilder fab = new FontAssetBuilder(font)
+FontAssetBuilder fab = new FontAssetBuilder(font);
 fab.CharList = charList;
 TMProOld.TMP_FontAsset fontAsset = fab.Create();
 ```
