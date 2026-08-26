@@ -33,7 +33,7 @@ Go to Options > Mods > Custom Font
 
 #### All Chars Atlas
 
-The created font atlas includes characters that are not seen in the game. If this is off then it only includes characters that are seen in the game. The change will take effect when you load a save file.
+The created font atlas includes every character from the font file. If this is off then it only includes characters used in the game. The change will take effect when you load a save file.
 
 > [!WARNING]
 > Enabling this option will cause noticeable load delay if the font file is large (> 1MB), which can take from seconds up to several minutes.
